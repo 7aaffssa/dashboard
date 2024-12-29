@@ -1,5 +1,7 @@
 import React from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { Sidebar } from '../components/dashboard/Sidebar';
+import { DashboardHeader } from '../components/dashboard/Header';
 import { PropertyManagement } from '../components/dashboard/admin/PropertyManagement';
 import { AgentDashboard } from '../components/dashboard/agent/AgentDashboard';
 import { ClientDashboard } from '../components/dashboard/client/ClientDashboard';
@@ -21,14 +23,14 @@ const mockRecentSearches = [
 ];
 
 export const Dashboard: React.FC = () => {
-  const [role, setRole] = React.useState<'admin' | 'agent' | 'client'>('admin');
-
+  const { user } = useAuth();
+  
   const handleNavigate = (path: string) => {
     console.log('Navigating to:', path);
   };
 
   const renderDashboard = () => {
-    switch (role) {
+    switch (user?.role) {
       case 'admin':
         return (
           <PropertyManagement
@@ -52,30 +54,19 @@ export const Dashboard: React.FC = () => {
             savedProperties={properties}
           />
         );
+      default:
+        return null;
     }
   };
 
-  // Temporary role switcher for demo purposes
-  const RoleSwitcher = () => (
-    <div className="mb-6 p-4 bg-white rounded-lg shadow">
-      <select
-        value={role}
-        onChange={(e) => setRole(e.target.value as 'admin' | 'agent' | 'client')}
-        className="border rounded-lg px-4 py-2"
-      >
-        <option value="admin">Admin View</option>
-        <option value="agent">Agent View</option>
-        <option value="client">Client View</option>
-      </select>
-    </div>
-  );
-
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar role={role} onNavigate={handleNavigate} />
-      <div className="flex-1 overflow-auto p-8">
-        <RoleSwitcher />
-        {renderDashboard()}
+      <Sidebar role={user?.role || 'client'} onNavigate={handleNavigate} />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <DashboardHeader />
+        <main className="flex-1 overflow-auto p-6">
+          {renderDashboard()}
+        </main>
       </div>
     </div>
   );
