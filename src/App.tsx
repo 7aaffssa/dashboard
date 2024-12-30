@@ -1,52 +1,34 @@
 import React from 'react';
-import { AuthProvider } from './contexts/AuthContext';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Navbar } from './components/Navbar';
+import { AuthLayout } from './components/AuthLayout';
 import { Home } from './pages/Home';
+import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
-import { AuthContainer } from './components/auth/AuthContainer';
-import { useAuth } from './contexts/AuthContext';
+import { useThemeStore } from './store/themeStore';
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    window.location.href = '/login';
-    return null;
-  }
-
-  return <>{children}</>;
-};
-
-function App() {
-  const path = window.location.pathname;
-
-  const renderContent = () => {
-    switch (path) {
-      case '/login':
-        return <AuthContainer />;
-      case '/dashboard':
-        return (
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        );
-      default:
-        return <Home />;
-    }
-  };
+export default function App() {
+  const isDarkMode = useThemeStore((state) => state.isDarkMode);
 
   return (
-    <AuthProvider>
-      {renderContent()}
-    </AuthProvider>
+    <div className={isDarkMode ? 'dark' : ''}>
+      <BrowserRouter>
+        <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/dashboard/*"
+              element={
+                <AuthLayout>
+                  <Dashboard />
+                </AuthLayout>
+              }
+            />
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </div>
   );
 }
-
-export default App;

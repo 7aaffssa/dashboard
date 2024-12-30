@@ -17,7 +17,6 @@ export const AuthService = {
 
     return user;
   },
-
   register: async (
     email: string,
     password: string,

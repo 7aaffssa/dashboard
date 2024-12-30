@@ -1,23 +1,9 @@
-export type UserRole = 'admin' | 'client' | 'agent';
+export type UserRole = 'admin' | 'client' | 'intermediary';
 
 export interface User {
   id: string;
-  name: string;
   email: string;
+  name: string;
   role: UserRole;
   avatar?: string;
-}
-
-export interface Agent extends User {
-  role: 'agent';
-  listings: string[];
-  clients: string[];
-  commissionRate: number;
-}
-
-export interface Client extends User {
-  role: 'client';
-  favorites: string[];
-  searches: string[];
-  inquiries: string[];
 }
